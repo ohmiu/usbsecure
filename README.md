@@ -1,2 +1,13 @@
-# usbsecure
-USBSECURE is a sleek GUI application designed to ensure the security of your files with AES encryption. Seamlessly encrypting all files on your disk, USBSECURE features automatic disk detection for effortless operation. Additionally, users have the flexibility to set their own English passwords for enhanced security.
+**USBSECURE**
+
+USBSECURE is a lightweight GUI application designed to encrypt files on your disk for enhanced security using AES encryption. With USBSECURE, you can protect your sensitive data with ease. This README file provides instructions on how to use USBSECURE effectively.
+
+### Features:
+- AES encryption for file security
+- Automatic disk detection for convenience
+- Customizable English password selection for user-defined security
+
+### Installation:
+1. Clone or download the USBSECURE repository to your local machine.
+2. Ensure you have Python installed (version X.X.X or higher).
+3. Install the required dependencies by running:
