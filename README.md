@@ -9,5 +9,6 @@ USBSECURE is a lightweight GUI application designed to encrypt files on your dis
 
 ### Installation:
 1. Clone or download the USBSECURE repository to your local machine.
-2. Ensure you have Python installed (version X.X.X or higher).
+2. Ensure you have Python installed (version 3.7 or higher).
 3. Install the required dependencies by running:
+`pip install pyaescrypt customtkinter psutil`
