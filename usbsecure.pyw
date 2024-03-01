@@ -65,7 +65,7 @@ class MainWindow:
     def main():
 
         def validate_password(password):
-            if len(password) <= 8:
+            if len(password) < 8:
                 return False
             else:
                 return True
@@ -73,7 +73,7 @@ class MainWindow:
         def main_action():
             password = password_input.get()
             if password == '' or validate_password(password) == False:
-                return messagebox.showerror(title='Password error', message="Invalid password, must be > 9 symbols")
+                return messagebox.showerror(title='Password error', message="Invalid password, must be > 7 symbols")
             else:
                 answer = messagebox.askquestion(title='Are you sure?', message="All data will be encrypted / decrypted, are you sure?")
                 if answer == 'no':
@@ -91,6 +91,7 @@ class MainWindow:
 
             action_button.configure(state='disabled')
             password_input.configure(state='disabled')
+            fix_button.configure(state='disabled')
 
             for root, dirs, files in os.walk(CURRENT_DRIVE + ':/'):
                 for file_name in files:
@@ -107,9 +108,12 @@ class MainWindow:
 
                     except Exception as exl:
                         exl = str(exl)
-                        if 'Incorrect padding' in exl or 'Incorrect password' in exl:
-                            return
-                        ctk.CTkLabel(logs_frame, text="1 file skipped with reason: " + exl).pack()
+                        if exl.startswith('Wrong password'):
+                            action_button.configure(state='normal')
+                            password_input.configure(state='normal')
+                            fix_button.configure(state='normal')
+                            return messagebox.showerror(title='Password error', message="Invalid password, can't decrypt")
+                        ctk.CTkLabel(logs_frame, text="1 file skipped with reason:\n" + exl).pack()
             
             if ACTION == 'enc':
                 is_encrypted_label.configure(text='Is device encrypted: Yes')
@@ -120,10 +124,38 @@ class MainWindow:
 
             action_button.configure(state='normal')
             password_input.configure(state='normal')
+            fix_button.configure(state='normal')
             messagebox.showinfo(title="All done", message=f"All done.\nTotal: {str(COUNTY)}")
 
             
-            
+        def fix_dual_names():
+            action_button.configure(state='disabled')
+            password_input.configure(state='disabled')
+            fix_button.configure(state='disabled')
+            fixed_label = ctk.CTkLabel(logs_frame, text="Total fixed: 0")
+            skipped_label = ctk.CTkLabel(logs_frame, text="Total skipped: 0")
+            fixed_label.pack()
+            skipped_label.pack()
+            FIXED = 0
+            SKIPPED = 0
+            for root, dirs, files in os.walk(CURRENT_DRIVE + ':/'):
+                for file_name in files:
+                    try:
+                        file_path = os.path.join(root, file_name)
+                        if file_name.endswith('.usbsecure.usbsecure'):
+                            normalise = file_path.replace('.usbsecure.usbsecure', '.usbsecure')
+                            os.rename(file_path, normalise)
+                            FIXED = FIXED + 1
+                            fixed_label.configure(text='Total fixed: '+str(FIXED))
+                        else:
+                            SKIPPED = SKIPPED + 1
+                            skipped_label.configure(text='Total skipped: '+str(SKIPPED))
+                    except Exception as wtf_err:
+                        ctk.CTkLabel(logs_frame, text=str(wtf_err)).pack()
+            action_button.configure(state='normal')
+            password_input.configure(state='normal')
+            fix_button.configure(state='normal')
+                            
 
         def work_with_disk(letter: str):
             global CURRENT_DRIVE
@@ -139,6 +171,7 @@ class MainWindow:
             is_encrypted_label.configure(text='Is device encrypted: ' + IS_ENCRYPTED_DRIVE)
             action_button.configure(state='normal')
             password_input.configure(state='normal')
+            fix_button.configure(state='normal')
 
 
         def write_disks_list_gui():
@@ -176,9 +209,12 @@ class MainWindow:
         is_encrypted_label.place(x=350, y=100)
         action_button = ctk.CTkButton(app, text="Encrypt / Decrypt", command=lambda: Thread(target=main_action).start())
         action_button.place(x=350, y=140)
+        fix_button = ctk.CTkButton(app, text="Fix dual names", command=lambda: Thread(target=fix_dual_names).start())
+        fix_button.place(x=500, y=140)
 
         action_button.configure(state='disabled')
         password_input.configure(state='disabled')
+        fix_button.configure(state='disabled')
 
         app.resizable(width=False, height=False)
         app.mainloop()
