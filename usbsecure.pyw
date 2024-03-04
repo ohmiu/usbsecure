@@ -8,9 +8,22 @@ import customtkinter as ctk
 from threading import Thread
 from tkinter import messagebox
 
+COUNTFILES = '--'
+
 class BackEnd:
 
     bufferSize = 256 * 1024
+
+    @staticmethod
+    def count_files():
+        global COUNTFILES
+        FC = 0
+        for root, dirs, files in os.walk(CURRENT_DRIVE + ':/'):
+                for file_name in files:
+                    FC = FC + 1
+                    COUNTFILES = str(FC)
+        COUNTFILES = str(int(COUNTFILES) - 1)
+
 
     @staticmethod
     def encrypt_file(path, password):
@@ -42,6 +55,7 @@ class BackEnd:
         for letter in alphabet_upper:
             if os.path.exists(f'{letter}:/'):
                 disks.append(letter)
+        print('All drives: ' + str(disks))
         return disks
 
     @staticmethod
@@ -88,6 +102,7 @@ class MainWindow:
             county = ctk.CTkLabel(logs_frame, text="")
             county.pack()
             COUNTY = 0
+            Thread(target=BackEnd.count_files).start()
 
             action_button.configure(state='disabled')
             password_input.configure(state='disabled')
@@ -95,7 +110,8 @@ class MainWindow:
 
             for root, dirs, files in os.walk(CURRENT_DRIVE + ':/'):
                 for file_name in files:
-                    county.configure(text="Working with files: " + str(COUNTY))
+                    county.configure(text="Working with file: " + file_name + f'\nTotal: {str(COUNTY)}/{COUNTFILES}')
+                    print('Working with file: ' + file_name)
                     try:
                         file_path = os.path.join(root, file_name)
                         COUNTY = COUNTY + 1
@@ -172,6 +188,7 @@ class MainWindow:
             action_button.configure(state='normal')
             password_input.configure(state='normal')
             fix_button.configure(state='normal')
+            print('Selected ' + letter + ':/' + ' drive')
 
 
         def write_disks_list_gui():
